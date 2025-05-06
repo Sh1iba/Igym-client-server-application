@@ -1,0 +1,19 @@
+# Укажите исходные файлы (папки 'src', 'main/java' и т. д.)
+INPUT                  = src/
+
+# Рекурсивный обход подпапок
+RECURSIVE              = YES
+
+# Язык (Java/Kotlin)
+OPTIMIZE_OUTPUT_JAVA   = YES
+
+# Документировать всё, включая приватные методы
+EXTRACT_ALL            = YES
+EXTRACT_PRIVATE        = YES
+
+# Форматы вывода (HTML по умолчанию)
+GENERATE_HTML          = YES
+GENERATE_LATEX         = NO
+
+# Исключить папки (например, сгенерированные файлы)
+EXCLUDE_PATTERNS       = */build/*, */generated/*
