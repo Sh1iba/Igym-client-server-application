@@ -1,7 +1,10 @@
 package com.example.igym.screens
 
+import android.net.http.HttpException
+import android.os.Build
 import android.util.Log
 import android.widget.Toast
+import androidx.annotation.RequiresExtension
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -61,7 +64,9 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import org.json.JSONObject
 
+@RequiresExtension(extension = Build.VERSION_CODES.S, version = 7)
 @Composable
 fun SignInScreen(navController: NavController){
     Column(
@@ -232,6 +237,7 @@ fun SignInScreen(navController: NavController){
             }
         }
 
+
         val loginManager = remember { LoginManager() }
         var errorMessage by remember { mutableStateOf<String?>(null) }
         var isLoading by remember { mutableStateOf(false) }
@@ -239,7 +245,7 @@ fun SignInScreen(navController: NavController){
 
         LaunchedEffect(errorMessage) {
             errorMessage?.let { message ->
-                Toast.makeText(context, message, Toast.LENGTH_LONG).show()
+                Toast.makeText(context, message, Toast.LENGTH_LONG).show() // Показываем сообщение
                 errorMessage = null
             }
         }
@@ -249,7 +255,6 @@ fun SignInScreen(navController: NavController){
                 .fillMaxWidth()
                 .padding(top = 20.dp),
             horizontalAlignment = Alignment.CenterHorizontally
-
         ) {
             Button(
                 onClick = {
@@ -260,9 +265,11 @@ fun SignInScreen(navController: NavController){
                     }
                     errorMessage = null
                     isLoading = true
+
                     CoroutineScope(Dispatchers.IO).launch {
                         try {
                             Log.d("Login", "Выполняется вход...")
+
                             val result = loginManager.loginUser(email, password)
 
                             withContext(Dispatchers.Main) {
@@ -270,18 +277,15 @@ fun SignInScreen(navController: NavController){
 
                                 when {
                                     result.isSuccess -> {
-
-                                        Log.d("Login", "Успещный вход!")
+                                        Log.d("Login", "Успешный вход!")
+                                        Log.d("LoginResponse", result.toString())
                                     }
 
                                     else -> {
-                                        val error = result.exceptionOrNull()
-                                        errorMessage = when {
-                                            error?.message?.contains("400") == true -> "Пользователь не найден"
-                                            error?.message?.contains("409") == true -> "Неверный пароль"
-                                            error?.message?.contains("500") == true -> "Ошибка сервера"
-                                            else -> "Ошибка: ${error?.message ?: "Неизвестная ошибка"}"
-                                        }
+
+                                        val error = result.exceptionOrNull()?.message
+                                        errorMessage = error
+                                        Log.d("ErrorResponse", error ?: "Неизвестная ошибка")
                                     }
                                 }
                             }
@@ -289,10 +293,11 @@ fun SignInScreen(navController: NavController){
                             withContext(Dispatchers.Main) {
                                 isLoading = false
                                 errorMessage = "Ошибка сети: ${e.message}"
-                                Log.e("Registration", "Ошибка в корутине", e)
+                                Log.e("Login", "Ошибка в корутине", e)
                             }
                         }
                     }
+
                 },
                 border = BorderStroke(1.dp, Color.White),
                 modifier = Modifier
@@ -318,8 +323,10 @@ fun SignInScreen(navController: NavController){
 
 
     }
+
 }
 
+@RequiresExtension(extension = Build.VERSION_CODES.S, version = 7)
 @Preview(showBackground = true, showSystemUi = true, name = "pre")
 @Composable
 fun SignInScreenPreview(){
