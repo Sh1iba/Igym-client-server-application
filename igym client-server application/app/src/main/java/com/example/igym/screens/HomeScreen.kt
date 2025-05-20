@@ -13,15 +13,15 @@ import androidx.navigation.compose.rememberNavController
 fun HomeScreen(navController: NavController){
     Column(
 
-    ) {  }
+    ) {
+
+    }
 
 }
-
-
 
 @Preview(showBackground = true, showSystemUi = true, name = "pre")
 @Composable
 fun HomeScreenPreview(){
     val navController = rememberNavController()
-    SignInScreen(navController = navController)
+    HomeScreen(navController = navController)
 }

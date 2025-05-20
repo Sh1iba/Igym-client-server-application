@@ -1,21 +1,17 @@
-package com.example.igym.screens
 
-import android.net.http.HttpException
-import android.os.Build
+
+package com.example.igym.screens
 import android.util.Log
 import android.widget.Toast
-import androidx.annotation.RequiresExtension
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -27,7 +23,6 @@ import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.LocalTextStyle
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -45,7 +40,6 @@ import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextAlign
@@ -58,8 +52,8 @@ import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.example.igym.R
 import com.example.igym.manager.LoginManager
+import com.example.igym.manager.RegistrationManager
 import com.example.igym.navigation.navigationRoutes
-import com.example.igym.ui.theme.PoppinsFontFamily
 import com.example.igym.ui.theme.colorDarkGray
 import com.example.igym.ui.theme.colorLightGray
 import com.example.igym.ui.theme.colorLightPurple
@@ -69,11 +63,9 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import org.json.JSONObject
 
-@RequiresExtension(extension = Build.VERSION_CODES.S, version = 7)
 @Composable
-fun SignInScreen(navController: NavController){
+fun RegistrationScreen(navController: NavController){
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -82,23 +74,23 @@ fun SignInScreen(navController: NavController){
         verticalArrangement = Arrangement.spacedBy(16.dp)
 
     ) {
-        Column (
+        Column(
             modifier = Modifier
                 .fillMaxWidth()
                 .wrapContentHeight()
-                .padding(top = 196.dp),
+                .padding(top = 130.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.spacedBy(16.dp)
-        ){
+        ) {
             Text(
-                text = "Войти в Аккаунт",
+                text = "Создать Аккаунт",
                 fontFamily = FontFamily(Font(R.font.poppins_bold)),
                 fontSize = 20.sp,
                 color = colorYellowGreen,
             )
 
             Text(
-                text = "Продолжайте отслеживать свои тренировки и прогресс в достижении целей." ,
+                text = "Ваш персональный дневник тренировок в одном клике.",
                 fontFamily = FontFamily(Font(R.font.poppins_regular)),
                 fontSize = 14.sp,
                 lineHeight = 14.sp,
@@ -111,6 +103,8 @@ fun SignInScreen(navController: NavController){
             )
         }
 
+        var username by remember { mutableStateOf("") }
+        var fullName by remember { mutableStateOf("") }
         var email by remember { mutableStateOf("") }
         var password by remember { mutableStateOf("") }
         var passwordVisible by remember { mutableStateOf(false) }
@@ -120,12 +114,51 @@ fun SignInScreen(navController: NavController){
                 .padding(top = 10.dp )
                 .background(colorLightPurple)
                 .fillMaxWidth()
-                .height(210.dp)
+                .height(340.dp)
         ) {
             Column(
                 modifier = Modifier
                     .padding(horizontal = 35.dp)
                     .padding(top = 20.dp)
+
+            ){
+                Text(
+                    text = "Логин",
+                    fontFamily = FontFamily(Font(R.font.poppins_medium)),
+                    fontSize = 16.sp,
+                    lineHeight = 24.sp,
+                    color = colorDarkGray,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(start = 2.dp)
+                )
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(40.dp)
+                        .clip(RoundedCornerShape(10.dp))
+                        .background(colorLightWhite),
+                    contentAlignment = Alignment.CenterStart
+                ) {
+                    BasicTextField(
+                        value = username,
+                        onValueChange = { username = it },
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 12.dp),
+                        textStyle = LocalTextStyle.current.copy(
+                            fontSize = 16.sp,
+                            lineHeight = 16.sp
+                        ),
+                        singleLine = true
+                    )
+                }
+            }
+
+            Column(
+                modifier = Modifier
+                    .padding(horizontal = 35.dp)
+                    .padding(top = 10.dp)
 
             ){
                 Text(
@@ -160,7 +193,6 @@ fun SignInScreen(navController: NavController){
                     )
                 }
             }
-
 
             Column(
                 modifier = Modifier
@@ -224,33 +256,57 @@ fun SignInScreen(navController: NavController){
                         )
                     }
                 }
-        }
-            Box(
+            }
+
+
+            Column(
                 modifier = Modifier
-                    .fillMaxWidth()
+                    .padding(horizontal = 35.dp)
+                    .padding(top = 10.dp)
+
             ){
                 Text(
-                    text = "забыли Пароль?",
+                    text = "ФИО",
                     fontFamily = FontFamily(Font(R.font.poppins_medium)),
-                    fontSize = 14.sp,
-                    lineHeight = 21.sp,
+                    fontSize = 16.sp,
+                    lineHeight = 24.sp,
                     color = colorDarkGray,
                     modifier = Modifier
-                        .align(Alignment.CenterEnd)
-                        .padding(top = 10.dp, end = 35.dp)
+                        .fillMaxWidth()
+                        .padding(start = 2.dp)
                 )
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(40.dp)
+                        .clip(RoundedCornerShape(10.dp))
+                        .background(colorLightWhite),
+                    contentAlignment = Alignment.CenterStart
+                ) {
+                    BasicTextField(
+                        value = fullName,
+                        onValueChange = { fullName = it },
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 12.dp),
+                        textStyle = LocalTextStyle.current.copy(
+                            fontSize = 16.sp,
+                            lineHeight = 16.sp
+                        ),
+                        singleLine = true
+                    )
+                }
             }
         }
 
-
-        val loginManager = remember { LoginManager() }
+        val registerManager = remember { RegistrationManager() }
         var errorMessage by remember { mutableStateOf<String?>(null) }
         var isLoading by remember { mutableStateOf(false) }
         val context = LocalContext.current
 
         LaunchedEffect(errorMessage) {
             errorMessage?.let { message ->
-                Toast.makeText(context, message, Toast.LENGTH_LONG).show() // Показываем только сообщение
+                Toast.makeText(context, message, Toast.LENGTH_LONG).show()
                 errorMessage = null
             }
         }
@@ -263,9 +319,9 @@ fun SignInScreen(navController: NavController){
         ) {
             Button(
                 onClick = {
-                    if (email.isEmpty() || password.isEmpty()) {
+                    if (username.isEmpty() || email.isEmpty() || password.isEmpty() || fullName.isEmpty()) {
                         errorMessage = "Все поля должны быть заполнены"
-                        Log.d("Login", "Все поля должны быть заполнены")
+                        Log.d("Registration", "Все поля должны быть заполнены")
                         return@Button
                     }
                     errorMessage = null
@@ -273,24 +329,24 @@ fun SignInScreen(navController: NavController){
 
                     CoroutineScope(Dispatchers.IO).launch {
                         try {
-                            Log.d("Login", "Выполняется вход...")
+                            Log.d("Registration", "Выполняется создание...")
 
-                            val result = loginManager.loginUser(email, password)
+                            val result = registerManager.registerUser(username, email, password, fullName)
 
                             withContext(Dispatchers.Main) {
                                 isLoading = false
 
                                 when {
                                     result.isSuccess -> {
-                                        navController.navigate(navigationRoutes.HOME) {
-                                            popUpTo(navigationRoutes.SIGN_IN) { inclusive = true }
+                                        navController.navigate(navigationRoutes.SIGN_IN) {
+                                            popUpTo(navigationRoutes.REGISTRATION) { inclusive = true }
                                         }
-                                        Log.d("Login", "Успешный вход!")
-                                        Log.d("LoginResponse", result.toString())
+                                        Log.d("Registration", "Успешная Регестрация!")
+                                        Log.d("RegistrationResponse", result.toString())
                                     }
 
                                     else -> {
-                                        // Просто выводим сообщение об ошибке
+
                                         val error = result.exceptionOrNull()?.message
                                         errorMessage = error
                                         Log.d("ErrorResponse", error ?: "Неизвестная ошибка")
@@ -310,7 +366,7 @@ fun SignInScreen(navController: NavController){
                 },
                 border = BorderStroke(1.dp, Color.White),
                 modifier = Modifier
-                    .width(180.dp)
+                    .width(195.dp)
                     .height(44.dp),
                 shape = RoundedCornerShape(20.dp),
                 colors = ButtonDefaults.buttonColors(
@@ -318,21 +374,23 @@ fun SignInScreen(navController: NavController){
                 )
             ) {
                 Text(
-                    text = "Войти",
+                    text = "Создать",
                     fontFamily = FontFamily(Font(R.font.poppins_bold)),
                     fontSize = 18.sp,
                     lineHeight = 24.sp,
                     color = Color.White,
+                    textAlign = TextAlign.Center,
                     modifier = Modifier
-                        .width(57.dp)
+                        .width(80.dp)
                         .height(24.dp)
+
                 )
             }
         }
 
         Column (
             modifier = Modifier
-                .padding(top = 90.dp)
+                .padding(top = 30.dp)
         ) {
             Text(
                 text = buildAnnotatedString {
@@ -341,7 +399,7 @@ fun SignInScreen(navController: NavController){
                             color = colorLightWhite
                         )
                     ) {
-                        append("У вас нет учетной записи? ")
+                        append("У вас уже есть аккаунт? ")
                     }
                     withStyle(
                         style = SpanStyle(
@@ -349,7 +407,7 @@ fun SignInScreen(navController: NavController){
                             textDecoration = TextDecoration.Underline
                         )
                     ) {
-                        append("Создать")
+                        append("Войти")
                     }
                 },
                 fontFamily = FontFamily(Font(R.font.poppins_medium)),
@@ -360,21 +418,18 @@ fun SignInScreen(navController: NavController){
                     .fillMaxWidth()
                     .height(19.dp)
                     .clickable {
-                        navController.navigate(navigationRoutes.REGISTRATION) {
-                            popUpTo(navigationRoutes.SIGN_IN) { inclusive = true }
+                        navController.navigate(navigationRoutes.SIGN_IN) {
+                            popUpTo(navigationRoutes.REGISTRATION) { inclusive = true }
                         }
                     }
             )
         }
-
     }
-
 }
 
-@RequiresExtension(extension = Build.VERSION_CODES.S, version = 7)
 @Preview(showBackground = true, showSystemUi = true, name = "pre")
 @Composable
-fun SignInScreenPreview(){
+fun RegistrationScreenPreview(){
     val navController = rememberNavController()
-    SignInScreen(navController = navController)
+    RegistrationScreen(navController = navController)
 }
