@@ -341,6 +341,7 @@ fun RegistrationScreen(navController: NavController){
                                         navController.navigate(navigationRoutes.SIGN_IN) {
                                             popUpTo(navigationRoutes.REGISTRATION) { inclusive = true }
                                         }
+                                        errorMessage = "Успешная Регестрация!"
                                         Log.d("Registration", "Успешная Регестрация!")
                                         Log.d("RegistrationResponse", result.toString())
                                     }

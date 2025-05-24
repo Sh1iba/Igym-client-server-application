@@ -9,9 +9,11 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.igym.navigation.navigationRoutes
+import com.example.igym.screens.CalculatorScreen
 import com.example.igym.screens.HomeScreen
 import com.example.igym.screens.RegistrationScreen
 import com.example.igym.screens.SignInScreen
+import com.example.igym.screens.calculators.BMICalculatorScreen
 
 class MainActivity : ComponentActivity() {
     @RequiresExtension(extension = Build.VERSION_CODES.S, version = 7)
@@ -31,6 +33,12 @@ class MainActivity : ComponentActivity() {
                 }
                 composable(navigationRoutes.REGISTRATION) {
                     RegistrationScreen(navController)
+                }
+                composable(navigationRoutes.CALCULATORS) {
+                    CalculatorScreen(navController)
+                }
+                composable(navigationRoutes.BMI_CALCULATOR) {
+                    BMICalculatorScreen(navController)
                 }
 
 
