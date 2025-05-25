@@ -6,4 +6,6 @@ object navigationRoutes {
     const val HOME = "home"
     const val CALCULATORS = "calculators"
     const val BMI_CALCULATOR = "bmi_calculator"
+    const val IDEAL_WEIGHT = "ideal_weight_calculator"
+
 }

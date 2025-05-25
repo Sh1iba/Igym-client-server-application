@@ -1,6 +1,7 @@
 package com.example.igym.screens
 
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -40,14 +41,10 @@ import com.example.igym.ui.theme.colorLightWhite
 
 @Composable
 fun HomeScreen(navController: NavController) {
-    Scaffold(
-        bottomBar = { BottomNavigationBar(navController) },
-        containerColor = colorDarkGray
-    ) { innerPadding ->
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(innerPadding),
+                .background(color = colorDarkGray),
             horizontalAlignment = Alignment.CenterHorizontally,
 
         ) {
@@ -60,96 +57,10 @@ fun HomeScreen(navController: NavController) {
             )
         }
     }
-}
-@Composable
-fun BottomNavigationBar(navController: NavController) {
-    Row(
-        modifier = Modifier
-            .height(60.dp)
 
-    ) {
-    val items = listOf(
-        BottomNavItem.Welcome,
-        BottomNavItem.Calculators,
-        BottomNavItem.Favorites,
-        BottomNavItem.Profile
-    )
 
-    val navBackStackEntry by navController.currentBackStackEntryAsState()
-    val currentRoute = navBackStackEntry?.destination?.route
 
-    NavigationBar(
-        containerColor = colorLightPurple,
-        contentColor = Color.White
-    ) {
-        items.forEach { item ->
-            NavigationBarItem(
-                icon = {
-                    if (item is BottomNavItem.Calculators) {
-                        Icon(
-                            painter = painterResource(id = R.drawable.calc),
-                            contentDescription = item.title,
-                            modifier = Modifier.size(30.dp)
-                        )
-                    } else {
-                        item.icon?.let {
-                            Icon(
-                                imageVector = it,
-                                contentDescription = item.title,
-                                modifier = Modifier.size(30.dp)
-                            )
-                        }
-                    }
-                },
 
-                selected = currentRoute == item.route,
-                onClick = {
-                    navController.navigate(item.route) {
-                        popUpTo(navController.graph.startDestinationId)
-                        launchSingleTop = true
-                    }
-                },
-                colors = NavigationBarItemDefaults.colors(
-                    selectedIconColor = colorLightWhite,
-                    selectedTextColor = colorLightWhite,
-                    unselectedIconColor = colorLightWhite,
-                    unselectedTextColor = colorLightWhite,
-                    indicatorColor = colorLightWhite
-                )
-            )
-        }
-    }
-}
-}
-
-sealed class BottomNavItem(
-    val route: String,
-    val title: String,
-    val icon: ImageVector? = null
-) {
-    object Profile : BottomNavItem(
-        route = "profile",
-        title = "Profile",
-        icon = Icons.Default.Person
-    )
-
-    object Calculators : BottomNavItem(
-        route = navigationRoutes.CALCULATORS,
-        title = "Calculators"
-    )
-
-    object Welcome : BottomNavItem(
-        route = "welcome",
-        title = "Home",
-        icon = Icons.Default.Home
-    )
-
-    object Favorites : BottomNavItem(
-        route = "favorites",
-        title = "Favorites",
-        icon = Icons.Default.Favorite
-    )
-}
 
 @Preview(showBackground = true, showSystemUi = true, name = "pre")
 @Composable

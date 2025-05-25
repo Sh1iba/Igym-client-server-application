@@ -48,7 +48,7 @@ fun CalculatorScreen(navController: NavController) {
             title = "Калькулятор идеального веса",
             description = "Определите ваш идеальный вес",
             imageRes = R.drawable.perfect_weight,
-            onClick = { }
+            onClick = {navController.navigate(navigationRoutes.IDEAL_WEIGHT) }
         ),
         CalculatorItem(
             title = "Калькулятор калорий",

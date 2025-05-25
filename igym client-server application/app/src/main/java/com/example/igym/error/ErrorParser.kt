@@ -1,4 +1,4 @@
-package com.example.igym.errorhandler
+package com.example.igym.error
 
 import android.util.Log
 import com.example.igym.network.model.response.ErrorResponse
