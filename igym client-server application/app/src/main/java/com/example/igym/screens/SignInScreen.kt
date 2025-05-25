@@ -1,5 +1,6 @@
 package com.example.igym.screens
 
+import android.content.Context
 import android.os.Build
 import android.util.Log
 import android.widget.Toast
@@ -243,6 +244,8 @@ fun SignInScreen(navController: NavController){
         var errorMessage by remember { mutableStateOf<String?>(null) }
         var isLoading by remember { mutableStateOf(false) }
         val context = LocalContext.current
+        val sharedPreferences = remember {
+            context.getSharedPreferences("auth_prefs", Context.MODE_PRIVATE) }
 
         LaunchedEffect(errorMessage) {
             errorMessage?.let { message ->
@@ -281,6 +284,15 @@ fun SignInScreen(navController: NavController){
                                         val responseBody = response.body()
                                         if (responseBody != null) {
                                             Log.d("Login", "Успешный вход! Токен: ${responseBody.token}")
+
+                                            with(sharedPreferences.edit()) {
+
+                                                putString("token", responseBody.token)
+                                                putString("email", responseBody.email)
+                                                putString("username", responseBody.username)
+                                                apply()
+                                            }
+
                                             navController.navigate(navigationRoutes.HOME) {
                                                 popUpTo(navigationRoutes.SIGN_IN) { inclusive = true }
                                             }
