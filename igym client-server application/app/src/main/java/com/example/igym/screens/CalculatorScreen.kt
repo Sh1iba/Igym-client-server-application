@@ -54,7 +54,7 @@ fun CalculatorScreen(navController: NavController) {
             title = "Калькулятор калорий",
             description = "Суточная норма калорий",
             imageRes = R.drawable.food,
-            onClick = {  }
+            onClick = {navController.navigate(navigationRoutes.DAILY_CALORIES) }
         ),
 
     )

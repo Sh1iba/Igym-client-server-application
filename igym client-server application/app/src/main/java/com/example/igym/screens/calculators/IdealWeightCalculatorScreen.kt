@@ -49,6 +49,7 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.example.igym.R
+import com.example.igym.network.model.enums.Gender
 import com.example.igym.ui.theme.colorDarkGray
 import com.example.igym.ui.theme.colorLightPurple
 import com.example.igym.ui.theme.colorLightWhite
@@ -59,9 +60,15 @@ fun IdealWeightCalculatorScreen(navController: NavController) {
     var height by remember { mutableStateOf("") }
     var age by remember { mutableStateOf("") }
     var wristSize by remember { mutableStateOf("") }
-    var selectedGender by remember { mutableStateOf(Gender.MALE) }
-    var result by remember { mutableStateOf<Double?>(null) }
 
+    var selectedGender by remember { mutableStateOf(Gender.MALE) }
+
+    var calculatedGender by remember { mutableStateOf(Gender.MALE) }
+    var calculatedAge by remember { mutableStateOf("") }
+    var calculatedWristSize by remember { mutableStateOf("") }
+    var calculatedHeight by remember { mutableStateOf("") }
+
+    var result by remember { mutableStateOf<Double?>(null) }
 
     fun calculateIdealWeight() {
         try {
@@ -70,12 +77,15 @@ fun IdealWeightCalculatorScreen(navController: NavController) {
             val wristValue = wristSize.toDouble()
 
 
-            val baseValue = when {
-                heightValue <= 165 -> heightValue - 100
-                heightValue <= 175 -> heightValue - 105
-                else -> heightValue - 110
-            }
+            calculatedGender = selectedGender
+            calculatedAge = age
+            calculatedWristSize = wristSize
+            calculatedHeight = height
 
+            val baseValue = when (selectedGender) {
+                Gender.MALE -> (heightValue - 100) - ((heightValue - 150) / 4)
+                Gender.FEMALE -> (heightValue - 100) - ((heightValue - 150) / 2.5)
+            }
 
             val bodyType = when (selectedGender) {
                 Gender.MALE -> when {
@@ -90,12 +100,11 @@ fun IdealWeightCalculatorScreen(navController: NavController) {
                 }
             }
 
-
             val ageCoefficient = when {
                 ageValue < 20 -> 1.0
-                ageValue <= 30 -> 0.89
+                ageValue <= 30 -> 0.95
                 ageValue <= 50 -> 1.0
-                else -> 1.06
+                else -> 1.05
             }
 
             val bodyTypeCoefficient = when (bodyType) {
@@ -152,7 +161,7 @@ fun IdealWeightCalculatorScreen(navController: NavController) {
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
             Text(
-                text = "Формула Брока учитывает рост, возраст, пол и тип телосложения для расчета идеального веса.",
+                text = "Расчет по формуле Лоренца с учетом пола, возраста и типа телосложения.",
                 fontFamily = FontFamily(Font(R.font.poppins_medium)),
                 fontSize = 16.sp,
                 color = colorLightWhite,
@@ -173,7 +182,6 @@ fun IdealWeightCalculatorScreen(navController: NavController) {
             keyboardType = KeyboardType.Number
         )
 
-
         Row(
             modifier = Modifier
                 .fillMaxWidth()
@@ -192,7 +200,7 @@ fun IdealWeightCalculatorScreen(navController: NavController) {
                 Row(
                     modifier = Modifier
                         .clickable { selectedGender = gender }
-                        .padding(8.dp),
+                        .padding(5.dp),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     RadioButton(
@@ -211,7 +219,6 @@ fun IdealWeightCalculatorScreen(navController: NavController) {
                 }
             }
         }
-
 
         InputField(
             label = "Обхват запястья (см)",
@@ -239,7 +246,6 @@ fun IdealWeightCalculatorScreen(navController: NavController) {
             )
         }
 
-        // Результат
         if (result != null) {
             Column(
                 modifier = Modifier
@@ -258,16 +264,18 @@ fun IdealWeightCalculatorScreen(navController: NavController) {
                 )
 
                 Text(
-                    text = "Формула Брока с учетом:\n" +
-                            "- ${selectedGender.displayName}\n" +
-                            "- Возраста: $age лет\n" +
-                            "- Типа телосложения",
+                    text = "Рассчитано по формуле Лоренца:\n" +
+                            "- Пол: ${calculatedGender.displayName}\n" +
+                            "- Рост: ${calculatedHeight} см\n" +
+                            "- Возраст: ${calculatedAge} лет\n" +
+                            "- Обхват запястья: ${calculatedWristSize} см",
                     fontFamily = FontFamily(Font(R.font.poppins_medium)),
                     fontSize = 14.sp,
                     color = colorDarkGray
                 )
             }
         }
+
         Spacer(
             modifier = Modifier
                 .fillMaxWidth()
@@ -275,20 +283,10 @@ fun IdealWeightCalculatorScreen(navController: NavController) {
                 .background(color = colorDarkGray)
         )
     }
-
-}
-
-private enum class Gender(val displayName: String) {
-    MALE("Мужчина"),
-    FEMALE("Женщина")
-}
-
-private enum class BodyType {
-    ASTHENIC, NORMOSTHENIC, HYPERSTHENIC
 }
 
 @Composable
-private fun InputField(
+fun InputField(
     label: String,
     value: String,
     onValueChange: (String) -> Unit,
@@ -332,7 +330,10 @@ private fun InputField(
             )
         }
     }
+}
 
+private enum class BodyType {
+    ASTHENIC, NORMOSTHENIC, HYPERSTHENIC
 }
 
 @Preview(showBackground = true, showSystemUi = true)

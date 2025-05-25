@@ -7,5 +7,6 @@ object navigationRoutes {
     const val CALCULATORS = "calculators"
     const val BMI_CALCULATOR = "bmi_calculator"
     const val IDEAL_WEIGHT = "ideal_weight_calculator"
+    const val DAILY_CALORIES = "daily_calories"
 
 }

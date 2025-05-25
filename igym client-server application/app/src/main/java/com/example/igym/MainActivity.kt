@@ -19,6 +19,7 @@ import com.example.igym.screens.MainAppScreen
 import com.example.igym.screens.RegistrationScreen
 import com.example.igym.screens.SignInScreen
 import com.example.igym.screens.calculators.BMICalculatorScreen
+import com.example.igym.screens.calculators.CalorieCalculatorScreen
 import com.example.igym.screens.calculators.IdealWeightCalculatorScreen
 
 class MainActivity : ComponentActivity() {
@@ -71,6 +72,11 @@ class MainActivity : ComponentActivity() {
                         composable(navigationRoutes.IDEAL_WEIGHT) {
                             MainAppScreen(navController) {
                                 IdealWeightCalculatorScreen(navController)
+                            }
+                        }
+                        composable(navigationRoutes.DAILY_CALORIES) {
+                            MainAppScreen(navController) {
+                                CalorieCalculatorScreen(navController)
                             }
                         }
                     }
