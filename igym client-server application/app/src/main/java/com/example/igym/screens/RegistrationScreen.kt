@@ -50,10 +50,11 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
+import com.example.igym.errorhandler.ErrorParser
 import com.example.igym.R
-import com.example.igym.manager.LoginManager
-import com.example.igym.manager.RegistrationManager
 import com.example.igym.navigation.navigationRoutes
+import com.example.igym.network.api.ApiClient
+import com.example.igym.network.model.request.RegisterRequest
 import com.example.igym.ui.theme.colorDarkGray
 import com.example.igym.ui.theme.colorLightGray
 import com.example.igym.ui.theme.colorLightPurple
@@ -299,7 +300,7 @@ fun RegistrationScreen(navController: NavController){
             }
         }
 
-        val registerManager = remember { RegistrationManager() }
+        val errorParser = remember { ErrorParser() }
         var errorMessage by remember { mutableStateOf<String?>(null) }
         var isLoading by remember { mutableStateOf(false) }
         val context = LocalContext.current
@@ -329,28 +330,36 @@ fun RegistrationScreen(navController: NavController){
 
                     CoroutineScope(Dispatchers.IO).launch {
                         try {
-                            Log.d("Registration", "Выполняется создание...")
-
-                            val result = registerManager.registerUser(username, email, password, fullName)
+                            Log.d("Registration", "Выполняется регистрация...")
+                            val request = RegisterRequest(username, email, password, fullName)
+                            val response = ApiClient.gymApi.registerUser(request)
 
                             withContext(Dispatchers.Main) {
                                 isLoading = false
 
                                 when {
-                                    result.isSuccess -> {
-                                        navController.navigate(navigationRoutes.SIGN_IN) {
-                                            popUpTo(navigationRoutes.REGISTRATION) { inclusive = true }
+                                    response.isSuccessful -> {
+                                        val responseBody = response.body()
+                                        if (responseBody != null) {
+                                            Log.d("Registration", "Успешная регистрация: $responseBody")
+                                            navController.navigate(navigationRoutes.SIGN_IN) {
+                                                popUpTo(navigationRoutes.REGISTRATION) { inclusive = true }
+                                            }
+
+                                            Toast.makeText(
+                                                context,
+                                                "Регистрация прошла успешно!",
+                                                Toast.LENGTH_LONG
+                                            ).show()
+                                        } else {
+                                            errorMessage = "Пустой ответ от сервера"
+                                            Log.e("Registration", "Пустой ответ от сервера (${response.code()})")
                                         }
-                                        errorMessage = "Успешная Регестрация!"
-                                        Log.d("Registration", "Успешная Регестрация!")
-                                        Log.d("RegistrationResponse", result.toString())
                                     }
-
                                     else -> {
-
-                                        val error = result.exceptionOrNull()?.message
-                                        errorMessage = error
-                                        Log.d("ErrorResponse", error ?: "Неизвестная ошибка")
+                                        val errorBody = response.errorBody()?.string() ?: "No error body"
+                                        Log.e("Registration", "Ошибка ${response.code()}: $errorBody")
+                                        errorMessage = errorParser.parseErrorMessage(errorBody) ?: "Неизвестная ошибка"
                                     }
                                 }
                             }
@@ -358,11 +367,10 @@ fun RegistrationScreen(navController: NavController){
                             withContext(Dispatchers.Main) {
                                 isLoading = false
                                 errorMessage = "Ошибка сети: ${e.message}"
-                                Log.e("Login", "Ошибка в корутине", e)
+                                Log.e("Registration", "Ошибка в корутине", e)
                             }
                         }
                     }
-
 
                 },
                 border = BorderStroke(1.dp, Color.White),

@@ -32,6 +32,7 @@ import androidx.navigation.NavController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.example.igym.R
+import com.example.igym.navigation.navigationRoutes
 import com.example.igym.ui.theme.colorDarkGray
 import com.example.igym.ui.theme.colorLightPurple
 import com.example.igym.ui.theme.colorLightWhite
@@ -65,6 +66,7 @@ fun BottomNavigationBar(navController: NavController) {
     Row(
         modifier = Modifier
             .height(60.dp)
+
     ) {
     val items = listOf(
         BottomNavItem.Welcome,
@@ -132,7 +134,7 @@ sealed class BottomNavItem(
     )
 
     object Calculators : BottomNavItem(
-        route = "calculators",
+        route = navigationRoutes.CALCULATORS,
         title = "Calculators"
     )
 

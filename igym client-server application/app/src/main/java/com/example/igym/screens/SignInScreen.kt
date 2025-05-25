@@ -1,6 +1,5 @@
 package com.example.igym.screens
 
-import android.net.http.HttpException
 import android.os.Build
 import android.util.Log
 import android.widget.Toast
@@ -11,11 +10,9 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -27,7 +24,6 @@ import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.LocalTextStyle
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -45,7 +41,6 @@ import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextAlign
@@ -54,13 +49,14 @@ import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
+import com.example.igym.errorhandler.ErrorParser
 import com.example.igym.R
-import com.example.igym.manager.LoginManager
+
 import com.example.igym.navigation.navigationRoutes
-import com.example.igym.ui.theme.PoppinsFontFamily
+import com.example.igym.network.api.ApiClient
+import com.example.igym.network.model.request.LoginRequest
 import com.example.igym.ui.theme.colorDarkGray
 import com.example.igym.ui.theme.colorLightGray
 import com.example.igym.ui.theme.colorLightPurple
@@ -70,7 +66,6 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import org.json.JSONObject
 
 @RequiresExtension(extension = Build.VERSION_CODES.S, version = 7)
 @Composable
@@ -244,7 +239,7 @@ fun SignInScreen(navController: NavController){
         }
 
 
-        val loginManager = remember { LoginManager() }
+        val errorParser = remember { ErrorParser() }
         var errorMessage by remember { mutableStateOf<String?>(null) }
         var isLoading by remember { mutableStateOf(false) }
         val context = LocalContext.current
@@ -275,26 +270,29 @@ fun SignInScreen(navController: NavController){
                     CoroutineScope(Dispatchers.IO).launch {
                         try {
                             Log.d("Login", "Выполняется вход...")
-
-                            val result = loginManager.loginUser(email, password)
+                            val request = LoginRequest(email, password)
+                            val response = ApiClient.gymApi.loginUser(request)
 
                             withContext(Dispatchers.Main) {
                                 isLoading = false
 
                                 when {
-                                    result.isSuccess -> {
-                                        navController.navigate(navigationRoutes.HOME) {
-                                            popUpTo(navigationRoutes.SIGN_IN) { inclusive = true }
+                                    response.isSuccessful -> {
+                                        val responseBody = response.body()
+                                        if (responseBody != null) {
+                                            Log.d("Login", "Успешный вход! Токен: ${responseBody.token}")
+                                            navController.navigate(navigationRoutes.HOME) {
+                                                popUpTo(navigationRoutes.SIGN_IN) { inclusive = true }
+                                            }
+                                        } else {
+                                            errorMessage = "Пустой ответ от сервера"
+                                            Log.e("Login", "Пустой ответ от сервера (${response.code()})")
                                         }
-                                        Log.d("Login", "Успешный вход!")
-                                        Log.d("LoginResponse", result.toString())
                                     }
-
                                     else -> {
-                                        // Просто выводим сообщение об ошибке
-                                        val error = result.exceptionOrNull()?.message
-                                        errorMessage = error
-                                        Log.d("ErrorResponse", error ?: "Неизвестная ошибка")
+                                        val errorBody = response.errorBody()?.string() ?: "No error body"
+                                        Log.e("Login", "Ошибка ${response.code()}: $errorBody")
+                                        errorMessage = errorParser.parseErrorMessage(errorBody) ?: "Неизвестная ошибка"
                                     }
                                 }
                             }
@@ -306,6 +304,7 @@ fun SignInScreen(navController: NavController){
                             }
                         }
                     }
+
 
 
                 },
