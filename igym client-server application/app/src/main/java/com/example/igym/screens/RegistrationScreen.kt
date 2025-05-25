@@ -1,6 +1,7 @@
 
 
 package com.example.igym.screens
+import android.content.Context
 import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.BorderStroke
@@ -304,6 +305,9 @@ fun RegistrationScreen(navController: NavController){
         var errorMessage by remember { mutableStateOf<String?>(null) }
         var isLoading by remember { mutableStateOf(false) }
         val context = LocalContext.current
+        val sharedPreferences = remember {
+            context.getSharedPreferences("user_prefs", Context.MODE_PRIVATE) }
+
 
         LaunchedEffect(errorMessage) {
             errorMessage?.let { message ->
@@ -342,6 +346,16 @@ fun RegistrationScreen(navController: NavController){
                                         val responseBody = response.body()
                                         if (responseBody != null) {
                                             Log.d("Registration", "Успешная регистрация: $responseBody")
+
+                                            with(sharedPreferences.edit()) {
+
+                                                putLong("userId", responseBody.userID)
+                                                putString("username", responseBody.username)
+                                                putString("email", responseBody.email)
+                                                putString("fullName", responseBody.fullName)
+                                                apply()
+                                            }
+
                                             navController.navigate(navigationRoutes.SIGN_IN) {
                                                 popUpTo(navigationRoutes.REGISTRATION) { inclusive = true }
                                             }
