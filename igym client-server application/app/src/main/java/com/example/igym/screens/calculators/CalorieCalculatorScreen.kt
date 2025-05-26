@@ -178,6 +178,7 @@ fun CalorieCalculatorScreen(navController: NavController) {
                 fontSize = 16.sp,
                 color = colorLightPurple,
                 modifier = Modifier.align(Alignment.CenterVertically)
+                    .padding(start = 2.dp)
             )
 
             Gender.values().forEach { gender ->
@@ -228,8 +229,10 @@ fun CalorieCalculatorScreen(navController: NavController) {
                 fontFamily = FontFamily(Font(R.font.poppins_medium)),
                 fontSize = 16.sp,
                 color = colorLightPurple,
-                modifier = Modifier.padding(start = 2.dp)
+                modifier = Modifier.padding(start = 2.dp, bottom = 4.dp)
             )
+
+            var isActivityExpanded by remember { mutableStateOf(false) }
 
             Box(
                 modifier = Modifier
@@ -237,47 +240,50 @@ fun CalorieCalculatorScreen(navController: NavController) {
                     .height(50.dp)
                     .clip(RoundedCornerShape(10.dp))
                     .background(colorLightWhite)
+                    .clickable { isActivityExpanded = true }
             ) {
-                var expanded by remember { mutableStateOf(false) }
+                Text(
+                    text = selectedActivityLevel.displayName,
+                    fontFamily = FontFamily(Font(R.font.poppins_regular)),
+                    fontSize = 16.sp,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 12.dp)
+                        .align(Alignment.CenterStart),
+                    color = colorDarkGray
+                )
 
-                ExposedDropdownMenuBox(
-                    expanded = expanded,
-                    onExpandedChange = { expanded = !expanded },
-                    modifier = Modifier.fillMaxWidth()
+                Icon(
+                    painter = painterResource(R.drawable.arrow_down), // убедись, что иконка есть
+                    contentDescription = "Activity dropdown",
+                    modifier = Modifier
+                        .align(Alignment.CenterEnd)
+                        .padding(end = 8.dp)
+                        .clickable { isActivityExpanded = true },
+                    tint = colorDarkGray
+                )
+
+                DropdownMenu(
+                    expanded = isActivityExpanded,
+                    onDismissRequest = { isActivityExpanded = false },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .background(colorLightWhite)
                 ) {
-                    TextField(
-                        value = selectedActivityLevel.displayName,
-                        onValueChange = {},
-                        readOnly = true,
-                        trailingIcon = {
-                            ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded)
-                        },
-                        colors = TextFieldDefaults.colors(
-                            focusedContainerColor = colorLightWhite,
-                            unfocusedContainerColor = colorLightWhite,
-                            disabledContainerColor = colorLightWhite,
-                            focusedTextColor = colorDarkGray,
-                            unfocusedTextColor = colorDarkGray,
-                            cursorColor = colorDarkGray,
-                            focusedIndicatorColor = Color.Transparent,
-                            unfocusedIndicatorColor = Color.Transparent
-                        ),
-                        modifier = Modifier.menuAnchor()
-                    )
-
-                    ExposedDropdownMenu(
-                        expanded = expanded,
-                        onDismissRequest = { expanded = false }
-                    ) {
-                        ActivityLevel.values().forEach { level ->
-                            DropdownMenuItem(
-                                text = { Text(level.displayName) },
-                                onClick = {
-                                    selectedActivityLevel = level
-                                    expanded = false
-                                }
-                            )
-                        }
+                    ActivityLevel.values().forEach { level ->
+                        DropdownMenuItem(
+                            text = {
+                                Text(
+                                    text = level.displayName,
+                                    fontFamily = FontFamily(Font(R.font.poppins_regular)),
+                                    fontSize = 16.sp
+                                )
+                            },
+                            onClick = {
+                                selectedActivityLevel = level
+                                isActivityExpanded = false
+                            }
+                        )
                     }
                 }
             }

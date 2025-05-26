@@ -21,6 +21,8 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.LocalTextStyle
+import androidx.compose.material3.RadioButton
+import androidx.compose.material3.RadioButtonDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -40,6 +42,7 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.example.igym.R
+import com.example.igym.network.model.enums.Gender
 import com.example.igym.screens.CalculatorScreen
 import com.example.igym.ui.theme.colorDarkGray
 import com.example.igym.ui.theme.colorLightPurple
@@ -53,28 +56,38 @@ fun BMICalculatorScreen(navController: NavController) {
 
     var height by remember { mutableStateOf("") }
     var weight by remember { mutableStateOf("") }
+    var selectedGender by remember { mutableStateOf(Gender.MALE) }
+
     var bmiResult by remember { mutableStateOf<Double?>(null) }
     var bmiCategory by remember { mutableStateOf("") }
 
-    // Функция для расчета ИМТ
     fun calculateBMI() {
         try {
-            val heightValue = height.toDouble() / 100 // Переводим см в метры
+            val heightValue = height.toDouble() / 100
             val weightValue = weight.toDouble()
             val bmi = weightValue / (heightValue * heightValue)
             bmiResult = bmi
 
-            // Определяем категорию
-            bmiCategory = when {
-                bmi < 16.0 -> "Выраженный дефицит массы тела"
-                bmi < 17.0 -> "Недостаточная масса (умеренный дефицит)"
-                bmi < 18.5 -> "Недостаточная масса (лёгкий дефицит)"
-                bmi < 25.0 -> "Нормальная масса тела"
-                bmi < 30.0 -> "Избыточная масса тела (предожирение)"
-                bmi < 35.0 -> "Ожирение I степени"
-                bmi < 40.0 -> "Ожирение II степени"
-                else -> "Ожирение III степени (морбидное)"
+            // Разные категории для мужчин и женщин
+            bmiCategory = when (selectedGender) {
+                Gender.MALE -> when {
+                    bmi < 18.5 -> "Недостаточная масса тела"
+                    bmi < 25.0 -> "Нормальная масса тела"
+                    bmi < 30.0 -> "Избыточная масса тела"
+                    bmi < 35.0 -> "Ожирение I степени"
+                    bmi < 40.0 -> "Ожирение II степени"
+                    else -> "Ожирение III степени"
+                }
+                Gender.FEMALE -> when {
+                    bmi < 18.0 -> "Недостаточная масса тела"
+                    bmi < 24.0 -> "Нормальная масса тела"
+                    bmi < 29.0 -> "Избыточная масса тела"
+                    bmi < 34.0 -> "Ожирение I степени"
+                    bmi < 39.0 -> "Ожирение II степени"
+                    else -> "Ожирение III степени"
+                }
             }
+
         } catch (e: Exception) {
             bmiResult = null
             bmiCategory = "Ошибка ввода данных"
@@ -89,14 +102,14 @@ fun BMICalculatorScreen(navController: NavController) {
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
+
         Column(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(horizontal = 15.dp)
                 .padding(top = 60.dp),
-            verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
-            Row() {
+            Row {
                 Icon(
                     painter = painterResource(id = R.drawable.baseline_arrow_left_24),
                     contentDescription = "Назад",
@@ -112,8 +125,8 @@ fun BMICalculatorScreen(navController: NavController) {
                     color = colorLightPurple,
                 )
             }
-
         }
+
         Column(
             modifier = Modifier
                 .fillMaxWidth()
@@ -121,16 +134,54 @@ fun BMICalculatorScreen(navController: NavController) {
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
             Text(
-                text = "Индекс массы тела (Body Mass Index, BMI) — простая " +
-                        "антропометрическая формула, применяемая для оценки " +
-                        "соответствия массы тела росту.",
+                text = "Индекс массы тела (BMI) — формула для оценки соответствия массы и роста тела. Пол влияет на интерпретацию результата.",
                 fontFamily = FontFamily(Font(R.font.poppins_medium)),
                 fontSize = 16.sp,
                 color = colorLightWhite,
             )
         }
 
+        // Пол
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 35.dp),
+            horizontalArrangement = Arrangement.spacedBy(5.dp)
+        ) {
+            Text(
+                text = "Пол:",
+                fontFamily = FontFamily(Font(R.font.poppins_medium)),
+                fontSize = 16.sp,
+                color = colorLightPurple,
+                modifier = Modifier.align(Alignment.CenterVertically)
+                        .padding(start = 2.dp)
+            )
 
+            Gender.values().forEach { gender ->
+                Row(
+                    modifier = Modifier
+                        .clickable { selectedGender = gender }
+                        .padding(5.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    RadioButton(
+                        selected = selectedGender == gender,
+                        onClick = { selectedGender = gender },
+                        colors = RadioButtonDefaults.colors(
+                            selectedColor = colorYellowGreen,
+                            unselectedColor = colorLightWhite
+                        )
+                    )
+                    Text(
+                        text = gender.displayName,
+                        color = colorLightWhite,
+                        modifier = Modifier.padding(start = 8.dp)
+                    )
+                }
+            }
+        }
+
+        // Рост
         Column(
             modifier = Modifier
                 .fillMaxWidth()
@@ -170,7 +221,7 @@ fun BMICalculatorScreen(navController: NavController) {
             }
         }
 
-        // Поле для ввода веса
+        // Вес
         Column(
             modifier = Modifier
                 .fillMaxWidth()
@@ -210,7 +261,7 @@ fun BMICalculatorScreen(navController: NavController) {
             }
         }
 
-        // Кнопка расчета
+
         Button(
             onClick = { calculateBMI() },
             modifier = Modifier
@@ -227,10 +278,10 @@ fun BMICalculatorScreen(navController: NavController) {
                 fontFamily = FontFamily(Font(R.font.poppins_bold)),
                 fontSize = 16.sp,
                 color = colorDarkGray
-
             )
         }
 
+        // Результат
         if (bmiResult != null) {
             Column(
                 modifier = Modifier
@@ -247,18 +298,17 @@ fun BMICalculatorScreen(navController: NavController) {
                     fontSize = 20.sp,
                     color = colorDarkGray
                 )
-
                 Text(
-                    text = bmiCategory,
+                    text = "Категория: $bmiCategory",
                     fontFamily = FontFamily(Font(R.font.poppins_medium)),
                     fontSize = 16.sp,
                     color = colorDarkGray
                 )
             }
         }
-
     }
 }
+
 
 @Preview(showBackground = true, showSystemUi = true, name = "pre")
 @Composable

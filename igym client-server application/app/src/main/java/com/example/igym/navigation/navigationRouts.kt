@@ -8,5 +8,6 @@ object navigationRoutes {
     const val BMI_CALCULATOR = "bmi_calculator"
     const val IDEAL_WEIGHT = "ideal_weight_calculator"
     const val DAILY_CALORIES = "daily_calories"
+    const val WEIGHT_GAIN_LOSS = "weight_gain_loss"
 
 }

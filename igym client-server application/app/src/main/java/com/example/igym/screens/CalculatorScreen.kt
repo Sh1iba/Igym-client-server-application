@@ -56,6 +56,13 @@ fun CalculatorScreen(navController: NavController) {
             imageRes = R.drawable.food,
             onClick = {navController.navigate(navigationRoutes.DAILY_CALORIES) }
         ),
+        CalculatorItem(
+            title = "Калькулятор набора/сброса веса",
+            description = "Посчитай каллории",
+            imageRes = R.drawable.gain_loss,
+            onClick = {navController.navigate(navigationRoutes.WEIGHT_GAIN_LOSS) }
+        ),
+
 
     )
 

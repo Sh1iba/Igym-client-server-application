@@ -194,6 +194,7 @@ fun IdealWeightCalculatorScreen(navController: NavController) {
                 fontSize = 16.sp,
                 color = colorLightPurple,
                 modifier = Modifier.align(Alignment.CenterVertically)
+                    .padding(start = 2.dp)
             )
 
             Gender.values().forEach { gender ->
