@@ -330,9 +330,9 @@ fun InputField(
 
 enum class BodyType(val s: String, val s1: String) {
     ASTHENIC("Астенический", "тонкокостный"), NORMOSTHENIC(
-        "Астенический",
-        "тонкокостный"
-    ), HYPERSTHENIC("Астенический", "тонкокостный")
+        "Нормостенический",
+        "нормальный"
+    ), HYPERSTHENIC("Гиперстенический", "ширококостный")
 }
 
 @Preview(showBackground = true, showSystemUi = true)

@@ -63,18 +63,24 @@ fun BodyTypeCalculatorScreen(navController: NavController) {
 
     fun calculateBodyType() {
         try {
-            val wristValue = wristSize.toDouble()
-            val sizeInCm = wristValue
+            // Убираем пробелы и заменяем запятую на точку
+            val normalizedInput = wristSize.trim().replace(',', '.')
+            val wristValue = normalizedInput.toDouble()
+
+            // Проверка на реалистичные границы
+            if (wristValue <= 0) {
+                throw IllegalArgumentException("Значение должно быть больше нуля")
+            }
 
             val type = when (selectedGender) {
                 Gender.MALE -> when {
-                    sizeInCm < 17 -> BodyType.ASTHENIC
-                    sizeInCm <= 20 -> BodyType.NORMOSTHENIC
+                    wristValue < 17 -> BodyType.ASTHENIC
+                    wristValue <= 20 -> BodyType.NORMOSTHENIC
                     else -> BodyType.HYPERSTHENIC
                 }
                 Gender.FEMALE -> when {
-                    sizeInCm < 16 -> BodyType.ASTHENIC
-                    sizeInCm <= 18 -> BodyType.NORMOSTHENIC
+                    wristValue < 16 -> BodyType.ASTHENIC
+                    wristValue <= 18 -> BodyType.NORMOSTHENIC
                     else -> BodyType.HYPERSTHENIC
                 }
             }
@@ -84,12 +90,12 @@ fun BodyTypeCalculatorScreen(navController: NavController) {
             resultText = when (selectedGender) {
                 Gender.MALE -> when (type) {
                     BodyType.ASTHENIC -> "Менее 17 см"
-                    BodyType.NORMOSTHENIC -> "17-20 см"
+                    BodyType.NORMOSTHENIC -> "17–20 см"
                     BodyType.HYPERSTHENIC -> "Более 20 см"
                 }
                 Gender.FEMALE -> when (type) {
                     BodyType.ASTHENIC -> "Менее 16 см"
-                    BodyType.NORMOSTHENIC -> "16-18 см"
+                    BodyType.NORMOSTHENIC -> "16–18 см"
                     BodyType.HYPERSTHENIC -> "Более 18 см"
                 }
             }
@@ -99,6 +105,7 @@ fun BodyTypeCalculatorScreen(navController: NavController) {
             resultText = "Ошибка ввода данных"
         }
     }
+
 
     Column(
         modifier = Modifier
@@ -287,11 +294,6 @@ fun BodyTypeCalculatorScreen(navController: NavController) {
     }
 }
 
-
-enum class LengthUnit(val displayName: String) {
-    CM("см"),
-    INCH("дюймов")
-}
 
 
 
