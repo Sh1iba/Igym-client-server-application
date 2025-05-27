@@ -65,8 +65,7 @@ fun HomeScreen(navController: NavController) {
 @Preview(showBackground = true, showSystemUi = true, name = "pre")
 @Composable
 fun HomeScreenPreview() {
-    MaterialTheme {
-        val navController = rememberNavController()
-        HomeScreen(navController = navController)
-    }
+    val navController = rememberNavController()
+    HomeScreen(navController = navController)
+
 }

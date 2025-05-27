@@ -5,6 +5,7 @@ import android.os.Build
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.annotation.RequiresApi
 import androidx.annotation.RequiresExtension
 import androidx.compose.runtime.remember
 import androidx.navigation.compose.NavHost
@@ -16,14 +17,18 @@ import com.example.igym.navigation.navigationRoutes
 import com.example.igym.screens.CalculatorScreen
 import com.example.igym.screens.HomeScreen
 import com.example.igym.screens.MainAppScreen
+import com.example.igym.screens.ProfileScreen
 import com.example.igym.screens.RegistrationScreen
+import com.example.igym.screens.SetUpScreen
 import com.example.igym.screens.SignInScreen
 import com.example.igym.screens.calculators.BMICalculatorScreen
+import com.example.igym.screens.calculators.BodyTypeCalculatorScreen
 import com.example.igym.screens.calculators.CalorieCalculatorScreen
 import com.example.igym.screens.calculators.IdealWeightCalculatorScreen
 import com.example.igym.screens.calculators.WeightGoalCalculatorScreen
 
 class MainActivity : ComponentActivity() {
+    @RequiresApi(Build.VERSION_CODES.O)
     @RequiresExtension(extension = Build.VERSION_CODES.S, version = 7)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -49,6 +54,10 @@ class MainActivity : ComponentActivity() {
 
                     composable(navigationRoutes.REGISTRATION) {
                         RegistrationScreen(navController)
+                    }
+
+                    composable(navigationRoutes.SET_UP) {
+                        SetUpScreen(navController)
                     }
 
                     navigation(
@@ -83,6 +92,16 @@ class MainActivity : ComponentActivity() {
                         composable(navigationRoutes.WEIGHT_GAIN_LOSS) {
                             MainAppScreen(navController) {
                                 WeightGoalCalculatorScreen(navController)
+                            }
+                        }
+                        composable(navigationRoutes.BODY_TYPE) {
+                            MainAppScreen(navController) {
+                               BodyTypeCalculatorScreen(navController)
+                            }
+                        }
+                        composable(navigationRoutes.PROFILE) {
+                            MainAppScreen(navController) {
+                                ProfileScreen(navController)
                             }
                         }
                     }

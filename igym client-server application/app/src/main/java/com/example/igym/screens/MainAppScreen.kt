@@ -115,7 +115,7 @@ sealed class BottomNavItem(
     val icon: ImageVector? = null
 ) {
     object Profile : BottomNavItem(
-        route = "profile",
+        route = navigationRoutes.PROFILE,
         title = "Profile",
         icon = Icons.Default.Person
     )

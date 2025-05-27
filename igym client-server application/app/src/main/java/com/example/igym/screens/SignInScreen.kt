@@ -286,16 +286,18 @@ fun SignInScreen(navController: NavController){
                                             Log.d("Login", "Успешный вход! Токен: ${responseBody.token}")
 
                                             with(sharedPreferences.edit()) {
-
+                                                putLong("userId", responseBody.userId)
                                                 putString("token", responseBody.token)
                                                 putString("email", responseBody.email)
                                                 putString("username", responseBody.username)
+                                                putString("fullName", responseBody.fullName)
                                                 apply()
                                             }
 
-                                            navController.navigate(navigationRoutes.HOME) {
+                                            navController.navigate(navigationRoutes.SET_UP) {
                                                 popUpTo(navigationRoutes.SIGN_IN) { inclusive = true }
                                             }
+
                                         } else {
                                             errorMessage = "Пустой ответ от сервера"
                                             Log.e("Login", "Пустой ответ от сервера (${response.code()})")

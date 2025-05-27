@@ -1,6 +1,9 @@
 package com.example.igym.screens
 
 import android.annotation.SuppressLint
+import android.content.Context
+import android.util.Log
+import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -30,6 +33,7 @@ import androidx.compose.material3.TextButton
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.material3.rememberDatePickerState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -38,6 +42,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
@@ -50,10 +55,18 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.example.igym.R
+import com.example.igym.error.ErrorParser
+import com.example.igym.navigation.navigationRoutes
+import com.example.igym.network.api.ApiClient
+import com.example.igym.network.model.request.UserProfile
 import com.example.igym.ui.theme.colorDarkGray
 import com.example.igym.ui.theme.colorLightPurple
 import com.example.igym.ui.theme.colorLightWhite
 import com.example.igym.ui.theme.colorYellowGreen
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -62,6 +75,21 @@ import java.util.Locale
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SetUpScreen(navController: NavController){
+
+    val context = LocalContext.current
+    val sharedPreferences = remember {
+        context.getSharedPreferences("auth_prefs", Context.MODE_PRIVATE)
+    }
+
+    val errorParser = remember { ErrorParser() }
+    var errorMessage by remember { mutableStateOf<String?>(null) }
+    var isLoading by remember { mutableStateOf(false) }
+
+    var gender by remember { mutableStateOf("") }
+    var birthDate by remember { mutableStateOf("") }
+    var height by remember { mutableStateOf("") }
+    var weight by remember { mutableStateOf("") }
+
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -118,8 +146,8 @@ fun SetUpScreen(navController: NavController){
                 .wrapContentHeight()
         ) {
             val genderOptions = listOf("Мужчина", "Женщина")
-            var gender by remember { mutableStateOf("") }
             var isGenderExpanded by remember { mutableStateOf(false) }
+
             Column(
                 modifier = Modifier
                     .padding(horizontal = 35.dp)
@@ -188,7 +216,6 @@ fun SetUpScreen(navController: NavController){
                 }
             }
 
-            var birthDate by remember { mutableStateOf("") }
             var showDatePicker by remember { mutableStateOf(false) }
             val dateFormatter = remember {
                 SimpleDateFormat("dd-MM-yyyy", Locale.getDefault())
@@ -255,9 +282,6 @@ fun SetUpScreen(navController: NavController){
                 }
             }
 
-            var height by remember { mutableStateOf("") }
-            var weight by remember { mutableStateOf("") }
-
             Row(
                 modifier = Modifier
                     .padding(horizontal = 35.dp)
@@ -303,15 +327,93 @@ fun SetUpScreen(navController: NavController){
 
 
         }
+        LaunchedEffect(errorMessage) {
+            errorMessage?.let { msg ->
+                Toast.makeText(context, msg, Toast.LENGTH_LONG).show()
+                errorMessage = null
+            }
+        }
+
         Column(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(top = 30.dp),
             horizontalAlignment = Alignment.CenterHorizontally
-
         ) {
             Button(
                 onClick = {
+                    val userId = sharedPreferences.getLong("userId", -1L)
+
+                    if (userId == -1L) {
+                        errorMessage = "Пользователь не найден. Войдите заново."
+                        return@Button
+                    }
+
+                    if (gender.isEmpty() || birthDate.isEmpty() || height.isEmpty() || weight.isEmpty()) {
+                        errorMessage = "Все поля должны быть заполнены"
+                        return@Button
+                    }
+
+                    isLoading = true
+                    val profile = UserProfile(
+                        userId = userId,
+                        sex = if (gender == "Мужчина") "MALE" else "FEMALE",
+                        birthDate = SimpleDateFormat("dd-MM-yyyy", Locale.getDefault())
+                            .parse(birthDate)
+                            ?.let { SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(it) } ?: "",
+                        height = height.toInt(),
+                        weight = weight.toDouble()
+                    )
+
+                    CoroutineScope(Dispatchers.IO).launch {
+                        try {
+                            val token = sharedPreferences.getString("token", null)
+
+                            if (token == null) {
+                                withContext(Dispatchers.Main) {
+                                    isLoading = false
+                                    errorMessage = "Токен авторизации не найден"
+                                }
+                                return@launch
+                            }
+
+                            val response = ApiClient.gymApi.updateProfile(profile, "$token")
+
+                            withContext(Dispatchers.Main) {
+                                isLoading = false
+                                if (response.isSuccessful) {
+                                    Log.d("SetUpScreen", "Профиль успешно обновлён")
+                                    Toast.makeText(context, "Профиль сохранён", Toast.LENGTH_SHORT).show()
+
+
+                                    with(sharedPreferences.edit()) {
+                                        putString("sex", response.body()?.sex.toString())
+                                        putString("birthDate", response.body()?.birthDate.toString())
+                                        response.body()?.height?.let { putInt("height", it) }
+                                        response.body()?.weight?.let { putFloat("weight", it.toFloat()) }
+                                        response.body()?.age?.let { putInt("age", it.toInt()) }
+                                        apply()
+                                    }
+
+                                    navController.navigate("main_app") {
+                                        popUpTo(navigationRoutes.SET_UP) { inclusive = true }
+                                    }
+                                } else {
+                                    val errorBody = response.errorBody()?.string()
+                                    errorMessage = errorBody?.let { errorParser.parseErrorMessage(it) }
+                                        ?: "Ошибка при сохранении профиля"
+                                    Log.e("SetUpScreen", "Ошибка при обновлении: $errorBody")
+                                }
+                            }
+                        } catch (e: Exception) {
+                            withContext(Dispatchers.Main) {
+                                isLoading = false
+                                errorMessage = "Ошибка сети: ${e.message}"
+                                Log.e("SetUpScreen", "Сетевая ошибка", e)
+                            }
+                        }
+                    }
+
                 },
                 modifier = Modifier
                     .width(195.dp)
@@ -325,20 +427,13 @@ fun SetUpScreen(navController: NavController){
                     text = "Начать",
                     fontFamily = FontFamily(Font(R.font.poppins_bold)),
                     fontSize = 18.sp,
-                    lineHeight = 24.sp,
-                    color = colorDarkGray,
-                    textAlign = TextAlign.Center,
-                    modifier = Modifier
-                        .width(80.dp)
-                        .height(24.dp)
-
+                    color = colorDarkGray
                 )
             }
         }
-
+    }
 
     }
-}
 
 @Preview(showBackground = true, showSystemUi = true, name = "pre")
 @Composable
