@@ -259,15 +259,15 @@ fun ProfileScreen(navController: NavController) {
                 horizontalAlignment = Alignment.CenterHorizontally,
             ) {
                 val menuItems = listOf(
-                    MenuItem("Profile", Icons.Default.Person, "profile"),
-                    MenuItem("Logout", Icons.Default.ExitToApp, "sign_in")
+                    MenuItem("Profile", Icons.Default.Person, navigationRoutes.PROFILE_CHANGE),
+                    MenuItem("Logout", Icons.Default.ExitToApp, navigationRoutes.SIGN_IN)
                 )
 
                 menuItems.forEach { item ->
                     val onClick = {
                         if (item.title == "Logout") {
                             showLogoutDialog.value = true
-                        } else {
+                        } else{
                             navController.navigate(item.route)
                         }
                     }
@@ -340,7 +340,7 @@ fun ProfileScreen(navController: NavController) {
                     TextButton(
                         onClick = {
                             authManager.logout()
-                            navController.navigate("sign_in") {
+                            navController.navigate(navigationRoutes.SIGN_IN) {
                                 popUpTo(navController.graph.startDestinationId) {
                                     inclusive = true
                                 }

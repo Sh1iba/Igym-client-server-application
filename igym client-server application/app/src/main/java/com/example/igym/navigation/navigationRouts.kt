@@ -12,5 +12,6 @@ object navigationRoutes {
     const val BODY_TYPE = "body_type"
     const val SET_UP = "set_up"
     const val PROFILE = "profile"
+    const val PROFILE_CHANGE = "change"
 
 }

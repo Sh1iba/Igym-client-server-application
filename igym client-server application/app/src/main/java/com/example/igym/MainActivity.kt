@@ -17,6 +17,7 @@ import com.example.igym.navigation.navigationRoutes
 import com.example.igym.screens.CalculatorScreen
 import com.example.igym.screens.HomeScreen
 import com.example.igym.screens.MainAppScreen
+import com.example.igym.screens.ProfileChangeScreen
 import com.example.igym.screens.ProfileScreen
 import com.example.igym.screens.RegistrationScreen
 import com.example.igym.screens.SetUpScreen
@@ -102,6 +103,11 @@ class MainActivity : ComponentActivity() {
                         composable(navigationRoutes.PROFILE) {
                             MainAppScreen(navController) {
                                 ProfileScreen(navController)
+                            }
+                        }
+                        composable(navigationRoutes.PROFILE_CHANGE) {
+                            MainAppScreen(navController) {
+                                ProfileChangeScreen(navController)
                             }
                         }
                     }
