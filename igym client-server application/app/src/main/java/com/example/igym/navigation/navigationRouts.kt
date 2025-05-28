@@ -16,5 +16,6 @@ object navigationRoutes {
     const val PROFILE = "profile"
     const val PROFILE_CHANGE = "change"
     const val WORKOUT_DETAILS = "workout_details"
+    const val MUSCLE_GROUP_EXERCISES = "muscle_group_exercises"
 
 }

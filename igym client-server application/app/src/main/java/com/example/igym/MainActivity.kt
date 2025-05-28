@@ -29,6 +29,7 @@ import com.example.igym.screens.calculators.BodyTypeCalculatorScreen
 import com.example.igym.screens.calculators.CalorieCalculatorScreen
 import com.example.igym.screens.calculators.IdealWeightCalculatorScreen
 import com.example.igym.screens.calculators.WeightGoalCalculatorScreen
+import com.example.igym.screens.workout.MuscleGroupExercisesScreen
 import com.example.igym.screens.workout.WorkoutDetailsScreen
 
 class MainActivity : ComponentActivity() {
@@ -121,6 +122,21 @@ class MainActivity : ComponentActivity() {
                                 WorkoutDetailsScreen(
                                     navController = navController,
                                     workoutId = backStackEntry.arguments?.getLong("workoutId") ?: 0L
+                                )
+                            }
+                        }
+                        composable(
+                            "${navigationRoutes.MUSCLE_GROUP_EXERCISES}/{muscleGroupId}/{muscleGroupName}",
+                            arguments = listOf(
+                                navArgument("muscleGroupId") { type = NavType.LongType },
+                                navArgument("muscleGroupName") { type = NavType.StringType }
+                            )
+                        ) { backStackEntry ->
+                            MainAppScreen(navController) {
+                                MuscleGroupExercisesScreen(
+                                    navController = navController,
+                                    muscleGroupId = backStackEntry.arguments?.getLong("muscleGroupId") ?: 0L,
+                                    muscleGroupName = backStackEntry.arguments?.getString("muscleGroupName") ?: "Упражнения"
                                 )
                             }
                         }

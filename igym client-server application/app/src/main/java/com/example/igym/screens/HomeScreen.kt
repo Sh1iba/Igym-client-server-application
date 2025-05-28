@@ -66,6 +66,7 @@ import com.example.igym.R
 import com.example.igym.manager.AuthManager
 import com.example.igym.navigation.navigationRoutes
 import com.example.igym.network.api.ApiClient
+import com.example.igym.network.model.response.workout.MuscleGroup
 import com.example.igym.network.model.response.workout.WorkoutsResponse
 
 import com.example.igym.ui.theme.colorDarkGray
@@ -87,6 +88,15 @@ fun HomeScreen(navController: NavController) {
     val authToken = remember { authManager.getAuthToken() }
 
     val workouts = remember { mutableStateListOf<WorkoutsResponse>() }
+    val muscleGroups = remember {
+        mutableStateListOf(
+            MuscleGroup(1, "Ноги", "Квадрицепсы, бицепсы бедер, ягодичные мышцы"),
+            MuscleGroup(2, "Грудные", "Большая и малая грудные мышцы"),
+            MuscleGroup(3, "Спина", "Широчайшие, трапециевидные, ромбовидные мышцы"),
+            MuscleGroup(4, "Плечи", "Дельтовидные мышцы"),
+            MuscleGroup(5, "Мышцы кора", "Прямые и косые мышцы живота")
+        )
+    }
 
     LaunchedEffect(selectedTab) {
         if (selectedTab == "workouts" && workouts.isEmpty()) {
@@ -182,16 +192,64 @@ fun HomeScreen(navController: NavController) {
                 }
             }
             "muscleGroups" -> {
-                Box(
-                    modifier = Modifier.fillMaxSize(),
-                    contentAlignment = Alignment.Center
+                LazyColumn(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 16.dp)
+                        .padding(top = 16.dp),
+                    verticalArrangement = Arrangement.spacedBy(12.dp)
                 ) {
-                    Text(
-                        text = "Группы мышц будут здесь",
-                        color = colorLightWhite
-                    )
+                    items(muscleGroups) { muscleGroup ->
+                        MuscleGroupBoxItem(
+                            muscleGroup = muscleGroup,
+                            onClick = {
+                                navController.navigate("${navigationRoutes.MUSCLE_GROUP_EXERCISES}/${muscleGroup.id}/${muscleGroup.name}")
+                            }
+                        )
+                    }
                 }
             }
+        }
+    }
+}
+
+@Composable
+fun MuscleGroupBoxItem(
+    muscleGroup: MuscleGroup,
+    onClick: () -> Unit
+) {
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(120.dp)
+            .clip(RoundedCornerShape(25.dp))
+            .background(color = colorLightPurple)
+            .clickable(onClick = onClick)
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(16.dp)
+        ) {
+            Text(
+                text = muscleGroup.name,
+                fontFamily = FontFamily(Font(R.font.poppins_medium)),
+                color = colorDarkGray,
+                fontSize = 20.sp,
+                lineHeight = 24.sp,
+            )
+
+            Spacer(modifier = Modifier.height(4.dp))
+
+            Text(
+                text = muscleGroup.description,
+                fontFamily = FontFamily(Font(R.font.poppins_regular)),
+                color = colorDarkGray,
+                fontSize = 16.sp,
+                lineHeight = 24.sp,
+                maxLines = 2,
+                overflow = TextOverflow.Ellipsis
+            )
         }
     }
 }
