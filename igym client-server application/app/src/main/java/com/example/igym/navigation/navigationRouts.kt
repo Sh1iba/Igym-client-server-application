@@ -1,5 +1,7 @@
 package com.example.igym.navigation
 
+import com.example.igym.network.model.response.workout.WorkoutDetails
+
 object navigationRoutes {
     const val REGISTRATION = "registration"
     const val SIGN_IN = "sign_in"
@@ -13,5 +15,6 @@ object navigationRoutes {
     const val SET_UP = "set_up"
     const val PROFILE = "profile"
     const val PROFILE_CHANGE = "change"
+    const val WORKOUT_DETAILS = "workout_details"
 
 }

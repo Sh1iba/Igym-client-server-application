@@ -8,9 +8,11 @@ import androidx.activity.compose.setContent
 import androidx.annotation.RequiresApi
 import androidx.annotation.RequiresExtension
 import androidx.compose.runtime.remember
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navArgument
 import androidx.navigation.navigation
 import com.example.igym.manager.AuthManager
 import com.example.igym.navigation.navigationRoutes
@@ -27,6 +29,7 @@ import com.example.igym.screens.calculators.BodyTypeCalculatorScreen
 import com.example.igym.screens.calculators.CalorieCalculatorScreen
 import com.example.igym.screens.calculators.IdealWeightCalculatorScreen
 import com.example.igym.screens.calculators.WeightGoalCalculatorScreen
+import com.example.igym.screens.workout.WorkoutDetailsScreen
 
 class MainActivity : ComponentActivity() {
     @RequiresApi(Build.VERSION_CODES.O)
@@ -110,6 +113,18 @@ class MainActivity : ComponentActivity() {
                                 ProfileChangeScreen(navController)
                             }
                         }
+                        composable(
+                            "${navigationRoutes.WORKOUT_DETAILS}/{workoutId}",
+                            arguments = listOf(navArgument("workoutId") { type = NavType.LongType })
+                        ) { backStackEntry ->
+                            MainAppScreen(navController) {
+                                WorkoutDetailsScreen(
+                                    navController = navController,
+                                    workoutId = backStackEntry.arguments?.getLong("workoutId") ?: 0L
+                                )
+                            }
+                        }
+
                     }
                 }
             }

@@ -6,6 +6,8 @@ import com.example.igym.network.model.request.UserProfile
 import com.example.igym.network.model.response.AuthResponse
 import com.example.igym.network.model.response.ProfileResponse
 import com.example.igym.network.model.response.RegisterResponse
+import com.example.igym.network.model.response.workout.WorkoutDetails
+import com.example.igym.network.model.response.workout.WorkoutsResponse
 import retrofit2.Response
 import retrofit2.http.Body
 import retrofit2.http.GET
@@ -28,6 +30,15 @@ interface ApiService {
 
     @GET("profiles/{id}")
     suspend fun getProfile(@Path("id") id: Long): UserProfile
+
+    ///------------------------------------Тренировки------------------------------------///
+
+    @GET("workouts")
+    suspend fun getWorkouts(@Header( "Authorization") token : String): Response<List<WorkoutsResponse>>
+
+    @GET("workouts/{workoutId}")
+    suspend fun getWorkoutDetails(@Path("workoutId") workoutId: Long, @Header("Authorization") token: String):
+            Response<WorkoutDetails>
 
 
 

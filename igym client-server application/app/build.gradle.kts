@@ -2,7 +2,7 @@ plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
     id("kotlin-kapt")
-    id("org.jetbrains.dokka") version "1.9.10" // Проверьте актуальную версию
+    id("org.jetbrains.dokka") version "1.9.10"
 
 }
 
@@ -55,9 +55,9 @@ android {
 
 dependencies {
     implementation ("androidx.datastore:datastore-preferences:1.0.0")
-    implementation ("com.squareup.moshi:moshi:1.13.0")  // для Moshi
-    implementation ("com.squareup.moshi:moshi-kotlin:1.13.0")  // для поддержки Kotlin
-    implementation ("org.jetbrains.kotlin:kotlin-reflect:1.8.10") // добавь поддержку рефлексии
+    implementation ("com.squareup.moshi:moshi:1.13.0")
+    implementation ("com.squareup.moshi:moshi-kotlin:1.13.0")
+    implementation ("org.jetbrains.kotlin:kotlin-reflect:1.8.10")
     implementation ("androidx.lifecycle:lifecycle-viewmodel-compose:2.6.2")
     implementation("com.squareup.moshi:moshi-kotlin:1.14.0")
     kapt("com.squareup.moshi:moshi-kotlin-codegen:1.14.0")

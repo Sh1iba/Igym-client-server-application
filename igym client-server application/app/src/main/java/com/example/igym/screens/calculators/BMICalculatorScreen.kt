@@ -221,7 +221,6 @@ fun BMICalculatorScreen(navController: NavController) {
             }
         }
 
-        // Вес
         Column(
             modifier = Modifier
                 .fillMaxWidth()

@@ -63,11 +63,11 @@ fun BodyTypeCalculatorScreen(navController: NavController) {
 
     fun calculateBodyType() {
         try {
-            // Убираем пробелы и заменяем запятую на точку
+
             val normalizedInput = wristSize.trim().replace(',', '.')
             val wristValue = normalizedInput.toDouble()
 
-            // Проверка на реалистичные границы
+
             if (wristValue <= 0) {
                 throw IllegalArgumentException("Значение должно быть больше нуля")
             }

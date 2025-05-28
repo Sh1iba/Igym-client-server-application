@@ -178,7 +178,7 @@ fun WeightGoalCalculatorScreen(navController: NavController) {
 
         Row(
         ) {
-            // DropdownSelector — Цель
+
             Column(modifier = Modifier.weight(1f)) {
                 DropdownSelector(
                     label = "Цель",
